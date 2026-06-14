@@ -172,12 +172,12 @@
             <div class="space-y-3 mb-5">
                 <div>
                     <label class="text-[10px] font-bold text-slate-500 uppercase">Pemicu Berbahaya #1</label>
-                    <input type="text" id="bl-1" placeholder="Misal: Sendirian di kamar jam 11 malam"
+                    <input type="text" id="bl-1" placeholder="Misal: Sendirian di kamar"
                         class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs outline-none focus:border-rose-500 mt-1">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-slate-500 uppercase">Pemicu Berbahaya #2</label>
-                    <input type="text" id="bl-2" placeholder="Misal: Stres pekerjaan/tugas menumpuk"
+                    <input type="text" id="bl-2" placeholder="Misal: VPN Masih Terinstall"
                         class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs outline-none focus:border-rose-500 mt-1">
                 </div>
                 <div>
@@ -435,7 +435,7 @@
                     if (currentHour < 5) {
                         statusMsg.innerText = "Sistem standby. Gerbang Ikrar Pagi baru akan dibuka pukul 05:00 subuh.";
                     } else {
-                        statusMsg.innerText = "Gerbang Ikrar Pagi telah ditutup (Batas maksimal jam 10:00 Pagi).";
+                        statusMsg.innerText = "Gerbang Ikrar telah ditutup (Batas maksimal jam 10:00 Pagi).";
                     }
                     statusMsg.className = "text-xs text-slate-500 mt-2 px-2";
                 }

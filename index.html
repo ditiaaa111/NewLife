@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="favicon.png" type="image/png">
+    <title>Commitment Tracker Pro | ADITYA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0f172a;
+            border-radius: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 antialiased font-sans">
+
+    <div
+        class="max-w-md w-full bg-slate-900/80 backdrop-blur-xl rounded-3xl shadow-2xl p-6 border border-slate-800 flex flex-col gap-5 relative">
+
+        <div class="text-center relative">
+            <div id="life-indicator"
+                class="absolute left-0 top-0 text-xs font-bold bg-slate-800/50 px-2 py-1 rounded-lg border border-slate-700">
+            </div>
+
+            <span id="greeting"
+                class="text-xs font-semibold tracking-wider uppercase text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full mt-6 inline-block">Pejuang
+                Tangguh</span>
+            <h1
+                class="text-2xl font-black tracking-tight mt-2 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                69 Days Challenge</h1>
+        </div>
+
+        <p id="stoic-quote" class="text-[11px] text-slate-400 italic text-center px-4 leading-relaxed"></p>
+
+        <div class="grid grid-cols-2 gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-850">
+            <div class="text-center border-r border-slate-800/60">
+                <p class="text-xs text-slate-400 font-medium">Waktu Diselamatkan</p>
+                <p id="calc-time" class="text-lg font-bold text-emerald-400 mt-1">0 Jam</p>
+            </div>
+            <div class="text-center">
+                <p class="text-xs text-slate-400 font-medium">Energi Mental</p>
+                <p id="calc-energy" class="text-lg font-bold text-indigo-400 mt-1">Pulih +0%</p>
+            </div>
+        </div>
+
+        <div class="bg-slate-950/40 p-4 rounded-2xl border border-slate-850 relative">
+            <div class="flex justify-between items-end mb-2">
+                <span class="text-xs font-medium text-slate-400">Progres Misi</span>
+                <div class="flex items-center gap-2">
+                    <button onclick="copyLaporan()"
+                        class="text-[10px] bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white px-2 py-1 rounded transition flex items-center gap-1 border border-slate-700 hover:border-indigo-500">
+                        📋 Salin Laporan
+                    </button>
+                    <span id="streak-text" class="text-sm font-bold text-purple-400">0 / 69 Hari</span>
+                </div>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden">
+                <div id="progress-bar"
+                    class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 h-full rounded-full transition-all duration-1000 cubic-bezier(0.4, 0, 0.2, 1)"
+                    style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-4 gap-2 text-center bg-slate-950/20 p-2 rounded-xl">
+            <div id="badge-7"
+                class="p-2 rounded-xl bg-slate-850 opacity-40 grayscale transition-all duration-500 text-xs">
+                <div class="text-lg">🥉</div>
+                <div class="font-bold mt-1 text-[10px]">7 Hari</div>
+            </div>
+            <div id="badge-14"
+                class="p-2 rounded-xl bg-slate-850 opacity-40 grayscale transition-all duration-500 text-xs">
+                <div class="text-lg">🥈</div>
+                <div class="font-bold mt-1 text-[10px]">14 Hari</div>
+            </div>
+            <div id="badge-30"
+                class="p-2 rounded-xl bg-slate-850 opacity-40 grayscale transition-all duration-500 text-xs">
+                <div class="text-lg">🥇</div>
+                <div class="font-bold mt-1 text-[10px]">30 Hari</div>
+            </div>
+            <div id="badge-50"
+                class="p-2 rounded-xl bg-slate-850 opacity-40 grayscale transition-all duration-500 text-xs">
+                <div class="text-lg">👑</div>
+                <div class="font-bold mt-1 text-[10px]">50 Hari</div>
+            </div>
+        </div>
+
+        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-850 text-center shadow-inner">
+            <p id="time-display" class="text-3xl font-mono font-black text-slate-200 tracking-widest">00:00:00</p>
+            <p id="status-message" class="text-xs text-slate-400 mt-2 font-medium px-2 leading-relaxed">Sinkronisasi
+                sistem...</p>
+        </div>
+
+        <div class="flex flex-col gap-2.5">
+            <button id="btn-start" onclick="openPledgeModal()"
+                class="w-full bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-indigo-600/20 disabled:opacity-30 disabled:pointer-events-none hidden">
+                🔒 Ikrar Pagi (05:00 - 10:00)
+            </button>
+
+            <button id="btn-end" onclick="openJournalModal()"
+                class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-emerald-600/20 disabled:opacity-30 disabled:pointer-events-none hidden">
+                ✓ Evaluasi Malam (20:00 - 23:59)
+            </button>
+
+            <button onclick="openPanicModal()"
+                class="w-full bg-rose-950/60 border border-rose-800/40 hover:bg-rose-900/40 text-rose-400 font-extrabold py-3 rounded-xl transition text-sm tracking-wide">
+                🚨 TOMBOL DARURAT (URGE)
+            </button>
+
+            <div class="flex gap-2 mt-2">
+                <button onclick="openVaultModal()"
+                    class="flex-1 text-slate-500 hover:text-indigo-400 font-semibold transition text-xs py-1">📂 Cek
+                    Evaluasi</button>
+                <button onclick="triggerResetFlow()"
+                    class="flex-1 text-slate-500 hover:text-rose-400 font-semibold transition text-xs py-1">Reset
+                    Progres</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-onboarding"
+        class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl max-w-sm w-full shadow-2xl text-center">
+            <div class="text-3xl mb-3">🛡️</div>
+            <h2 class="text-xl font-black mb-2">Identitas & Mode</h2>
+            <p class="text-xs text-slate-400 mb-5">Siapa namamu dan sekeras apa kamu ingin ditempa?</p>
+
+            <input type="text" id="user-name-input" placeholder="Nama Panggilan..."
+                class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-center outline-none focus:border-indigo-500 font-bold mb-4"
+                autocomplete="off">
+
+            <div class="space-y-2 mb-6 text-left">
+                <label
+                    class="block cursor-pointer bg-slate-950 border border-slate-800 rounded-xl p-3 hover:border-indigo-500 transition relative">
+                    <input type="radio" name="challenge_mode" value="iron" class="absolute right-4 top-4" checked>
+                    <span class="block font-bold text-sm text-slate-200">💀 Iron Mind Mode</span>
+                    <span class="text-[10px] text-slate-500">Sekali gagal, langsung reset ke 0 hari. Tanpa ampun.</span>
+                </label>
+                <label
+                    class="block cursor-pointer bg-slate-950 border border-slate-800 rounded-xl p-3 hover:border-indigo-500 transition relative">
+                    <input type="radio" name="challenge_mode" value="resilient" class="absolute right-4 top-4">
+                    <span class="block font-bold text-sm text-slate-200">❤️ Resilient Mode</span>
+                    <span class="text-[10px] text-slate-500">Diberi 3 nyawa. Gagal = -1 Nyawa & Mundur 3 Hari.</span>
+                </label>
+            </div>
+
+            <button onclick="saveNameAndMode()"
+                class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-500 transition">Lanjut
+                ke Strategi</button>
+        </div>
+    </div>
+
+    <div id="modal-blacklist-setup"
+        class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl max-w-sm w-full shadow-2xl text-left">
+            <h2 class="text-xl font-black text-rose-500 mb-2">Daftar Hitam Pemicu</h2>
+            <p class="text-xs text-slate-400 mb-4 leading-relaxed">Tulis 3 musuh terbesar/situasi paling berbahaya yang
+                sering membuatmu gagal. Ini akan muncul setiap pagi sebagai peringatan.</p>
+
+            <div class="space-y-3 mb-5">
+                <div>
+                    <label class="text-[10px] font-bold text-slate-500 uppercase">Pemicu Berbahaya #1</label>
+                    <input type="text" id="bl-1" placeholder="Misal: Sendirian di kamar jam 11 malam"
+                        class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs outline-none focus:border-rose-500 mt-1">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-500 uppercase">Pemicu Berbahaya #2</label>
+                    <input type="text" id="bl-2" placeholder="Misal: Stres pekerjaan/tugas menumpuk"
+                        class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs outline-none focus:border-rose-500 mt-1">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-500 uppercase">Pemicu Berbahaya #3</label>
+                    <input type="text" id="bl-3" placeholder="Misal: Scroll sosmed tanpa tujuan"
+                        class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs outline-none focus:border-rose-500 mt-1">
+                </div>
+            </div>
+
+            <button onclick="saveBlacklist()"
+                class="w-full bg-rose-600 text-white font-bold py-3 rounded-xl hover:bg-rose-500 transition">Kunci
+                Daftar Hitam & Mulai</button>
+        </div>
+    </div>
+
+    <div id="modal-pledge"
+        class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl max-w-sm w-full shadow-2xl">
+            <h2 class="text-lg font-black text-indigo-400 mb-1">Aktivasi Komitmen Kognitif</h2>
+
+            <div class="bg-rose-950/30 border border-rose-900/50 p-3 rounded-xl mb-4">
+                <p class="text-[10px] font-bold text-rose-400 uppercase tracking-wider mb-2">⚠️ Waspada Hari Ini:</p>
+                <ul id="display-blacklist" class="text-xs text-rose-200/80 list-disc pl-4 space-y-1">
+                </ul>
+            </div>
+
+            <p class="text-[11px] text-slate-400 mb-3">Ketik ulang kalimat di bawah untuk membuka proteksi hari ini:</p>
+            <p class="bg-slate-950 p-3 rounded-xl text-xs border border-slate-850 select-none font-medium italic text-slate-300 text-center mb-4"
+                id="target-pledge-text">Saya berjanji mengendalikan diri hari ini</p>
+            <input type="text" id="pledge-input" placeholder="Ketik persis kalimat di atas..."
+                class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm outline-none focus:border-indigo-500 mb-4 text-center"
+                autocomplete="off">
+            <div class="flex gap-2">
+                <button onclick="closeModal('modal-pledge')"
+                    class="flex-1 bg-slate-800 text-slate-400 font-bold py-2.5 rounded-xl text-xs">Batal</button>
+                <button onclick="verifyPledge()"
+                    class="flex-1 bg-indigo-600 text-white font-bold py-2.5 rounded-xl text-xs hover:bg-indigo-500">Konfirmasi</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-journal"
+        class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl max-w-sm w-full shadow-2xl">
+            <h2 class="text-lg font-black text-emerald-400 mb-1">Evaluasi Keberhasilan</h2>
+            <p class="text-xs text-slate-400 mb-4">Apa pemicu terbesar hari ini yang berhasil kamu taklukkan? (Opsional)
+            </p>
+            <textarea id="journal-input" rows="3"
+                class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm outline-none focus:border-emerald-500 mb-4 resize-none custom-scrollbar"
+                placeholder="Contoh: Hampir tergoda sosmed siang hari, tapi dialihkan baca buku..."></textarea>
+            <div class="flex gap-2">
+                <button onclick="closeModal('modal-journal')"
+                    class="flex-1 bg-slate-800 text-slate-400 font-bold py-2.5 rounded-xl text-xs">Batal</button>
+                <button onclick="submitEndDay()"
+                    class="flex-1 bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs hover:bg-emerald-500">Amankan
+                    Hari Ini</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-autopsy"
+        class="fixed inset-0 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border-2 border-rose-500/30 p-6 rounded-2xl max-w-sm w-full shadow-2xl">
+            <h2 class="text-lg font-black text-rose-400 mb-1">Bedah Kegagalan</h2>
+            <p id="autopsy-desc" class="text-xs text-slate-400 mb-4">Gagal adalah data. Isi instrumen ini dengan jujur
+                sebelum sistem diproses.</p>
+
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">1. Apa pemicu
+                spesifiknya?</label>
+            <select id="autopsy-trigger"
+                class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-300 outline-none focus:border-rose-500 mb-3">
+                <option value="Bosan / Sendirian di Kamar">Bosan / Sendirian di Kamar</option>
+                <option value="Stres / Kelelahan Pikiran">Stres / Kelelahan Pikiran</option>
+                <option value="Akses Konten/Sosmed Terlalu Lama">Akses Konten/Sosmed Terlalu Lama</option>
+                <option value="Pikiran Negatif Tidak Segera Dialihkan">Pikiran Negatif Tidak Segera Dialihkan</option>
+            </select>
+
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">2. Strategi konkret
+                untuk menghindarinya besok?</label>
+            <textarea id="autopsy-plan" rows="2"
+                class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs outline-none focus:border-rose-500 mb-4 resize-none custom-scrollbar"
+                placeholder="Contoh: Taruh HP di luar kamar sebelum tidur malam..."></textarea>
+
+            <div class="flex gap-2">
+                <button onclick="closeModal('modal-autopsy')"
+                    class="flex-1 bg-slate-800 text-slate-400 font-bold py-2.5 rounded-xl text-xs">Batal</button>
+                <button id="btn-execute-reset" onclick="executeResetData()"
+                    class="flex-1 bg-rose-600 text-white font-bold py-2.5 rounded-xl text-xs hover:bg-rose-500">Proses
+                    Penalti</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-panic"
+        class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-900 border-2 border-rose-600 p-6 rounded-2xl max-w-sm w-full shadow-2xl text-center">
+            <div
+                class="w-12 h-12 rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center text-xl font-bold mx-auto mb-3 animate-ping">
+                ⚠️</div>
+            <h2 class="text-xl font-black text-rose-500 mb-2">SISTEM DARURAT</h2>
+            <p class="text-xs text-slate-300 leading-relaxed mb-4">Otakmu sedang memanipulasimu demi dopamin murah 5
+                detik. Jangan hancurkan progres berhargamu!</p>
+            <div
+                class="bg-slate-950 border border-slate-850 p-4 rounded-xl text-left text-xs text-slate-400 space-y-2 mb-5">
+                <p class="font-bold text-slate-200"> Protokol Fisik Instan:</p>
+                <p>1. Ambil air wudhu / Cuci muka air dingin secara penuh.</p>
+                <p>2. Drop dan lakukan 15 kali Push-up saat ini juga.</p>
+                <p>3. Letakkan HP, buka pintu kamar, cari orang lain.</p>
+            </div>
+            <button onclick="closeModal('modal-panic')"
+                class="w-full bg-slate-800 text-white font-bold py-3 rounded-xl hover:bg-slate-700 text-xs transition">Saya
+                Berhasil Lewati Doktrin Palsu Ini</button>
+        </div>
+    </div>
+
+    <div id="modal-vault"
+        class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+        <div
+            class="bg-slate-900 border border-slate-800 p-5 rounded-2xl max-w-sm w-full shadow-2xl flex flex-col max-h-[80vh]">
+            <h2 class="text-lg font-black text-indigo-400 mb-1">Rekam Jejak Evaluasi</h2>
+            <p class="text-[10px] text-slate-400 mb-4">Pelajari pola kegagalanmu di masa lalu untuk strategi masa depan.
+            </p>
+            <div id="vault-list" class="flex-1 overflow-y-auto custom-scrollbar space-y-3 mb-4 pr-1"></div>
+            <button onclick="closeModal('modal-vault')"
+                class="w-full bg-slate-800 text-slate-200 font-bold py-2.5 rounded-xl text-xs">Tutup Vault</button>
+        </div>
+    </div>
+
+    <div id="modal-alert"
+        class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-[60] hidden">
+        <div class="bg-slate-900 border border-slate-850 p-5 rounded-2xl max-w-xs w-full text-center shadow-2xl">
+            <div id="alert-icon" class="text-3xl mb-2">🎉</div>
+            <h3 id="alert-title" class="text-base font-black text-indigo-400">Pemberitahuan</h3>
+            <p id="alert-desc" class="text-xs text-slate-400 mt-2 mb-4 leading-relaxed"></p>
+            <button onclick="closeModal('modal-alert')"
+                class="w-full bg-slate-800 text-slate-200 font-bold py-2 rounded-xl text-xs">Oke</button>
+        </div>
+    </div>
+
+    <script>
+        const targetDays = 69;
+        const p_phrase = "saya berjanji mengendalikan diri hari ini";
+
+        const quotes = [
+            '"Jangan biarkan harimu mengalir tanpa arah. Jiwa yang tidak memiliki tujuan yang pasti akan tersesat." – Seneca',
+            '"Kita lebih sering menderita dalam imajinasi daripada dalam kenyataan." – Seneca',
+            '"Tidak ada orang bebas yang tidak bisa mengendalikan dirinya sendiri." – Pythagoras',
+            '"Kemenangan pertama dan terbaik adalah menaklukkan diri sendiri." – Plato',
+            '"Jangan korbankan apa yang paling kamu inginkan demi apa yang kamu inginkan sekarang."'
+        ];
+
+        let userName = localStorage.getItem('habitUserName');
+        let streak = parseInt(localStorage.getItem('habitStreak')) || 0;
+        let dayStarted = localStorage.getItem('dayStarted') === 'true';
+        let lastDate = localStorage.getItem('lastDate');
+
+        // Fitur Baru: Mode & Lives
+        let userMode = localStorage.getItem('userMode'); // 'iron' or 'resilient'
+        let lives = parseInt(localStorage.getItem('userLives'));
+
+        // Fitur Baru: Blacklist
+        let blacklists = JSON.parse(localStorage.getItem('habitBlacklists')) || [];
+
+        // Modals
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function openPanicModal() { openModal('modal-panic'); }
+
+        function customAlert(title, desc, icon = "⚡") {
+            document.getElementById('alert-icon').innerText = icon;
+            document.getElementById('alert-title').innerText = title;
+            document.getElementById('alert-desc').innerText = desc;
+            openModal('modal-alert');
+        }
+
+        function initData() {
+            document.getElementById('stoic-quote').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+
+            if (!userName) {
+                openModal('modal-onboarding');
+            } else if (blacklists.length === 0) {
+                openModal('modal-blacklist-setup');
+            } else {
+                document.getElementById('greeting').innerText = `Semangat, ${userName}!`;
+            }
+
+            setInterval(updateClock, 1000);
+            updateUI();
+            updateClock();
+        }
+
+        // Simpan Nama dan Mode
+        function saveNameAndMode() {
+            const inputName = document.getElementById('user-name-input').value.trim();
+            const mode = document.querySelector('input[name="challenge_mode"]:checked').value;
+
+            if (inputName) {
+                userName = inputName;
+                userMode = mode;
+                lives = mode === 'resilient' ? 3 : 0;
+
+                localStorage.setItem('habitUserName', userName);
+                localStorage.setItem('userMode', userMode);
+                localStorage.setItem('userLives', lives);
+
+                document.getElementById('greeting').innerText = `Semangat, ${userName}!`;
+                closeModal('modal-onboarding');
+                openModal('modal-blacklist-setup'); // Lanjut ke Blacklist
+            }
+        }
+
+        // Simpan Blacklist
+        function saveBlacklist() {
+            const b1 = document.getElementById('bl-1').value.trim() || 'Pemicu tidak terdefinisi 1';
+            const b2 = document.getElementById('bl-2').value.trim() || 'Pemicu tidak terdefinisi 2';
+            const b3 = document.getElementById('bl-3').value.trim() || 'Pemicu tidak terdefinisi 3';
+
+            blacklists = [b1, b2, b3];
+            localStorage.setItem('habitBlacklists', JSON.stringify(blacklists));
+
+            closeModal('modal-blacklist-setup');
+            updateUI();
+            customAlert("Sistem Siap", "Daftar hitam telah dikunci. Berhati-hatilah dengan pemicumu hari ini.", "🛡️");
+        }
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('time-display').innerText = now.toLocaleTimeString('id-ID', { hour12: false });
+            checkTimeRules(now.getHours());
+        }
+
+        function checkTimeRules(currentHour) {
+            const btnStart = document.getElementById('btn-start');
+            const btnEnd = document.getElementById('btn-end');
+            const statusMsg = document.getElementById('status-message');
+            const todayDate = new Date().toDateString();
+
+            if (lastDate === todayDate) {
+                btnStart.classList.add('hidden');
+                btnEnd.classList.add('hidden');
+                statusMsg.innerText = "Target hari ini tercapai murni. Jaga ritme, bersiap untuk esok pagi!";
+                statusMsg.className = "text-xs text-emerald-400 font-semibold mt-2 px-2";
+                return;
+            }
+
+            if (!dayStarted) {
+                btnStart.classList.remove('hidden');
+                btnEnd.classList.add('hidden');
+                if (currentHour >= 5 && currentHour < 10) {
+                    btnStart.disabled = false;
+                    statusMsg.innerText = "Fajar telah tiba. Gerbang ikrar dibuka, kunci komitmenmu sekarang!";
+                    statusMsg.className = "text-xs text-indigo-400 font-semibold mt-2 px-2";
+                } else {
+                    btnStart.disabled = true;
+                    if (currentHour < 5) {
+                        statusMsg.innerText = "Sistem standby. Gerbang Ikrar Pagi baru akan dibuka pukul 05:00 subuh.";
+                    } else {
+                        statusMsg.innerText = "Kamu terlambat! Gerbang Ikrar Pagi telah ditutup (Batas maksimal jam 10:00).";
+                    }
+                    statusMsg.className = "text-xs text-slate-500 mt-2 px-2";
+                }
+            } else {
+                btnStart.classList.add('hidden');
+                btnEnd.classList.remove('hidden');
+                if (currentHour >= 20 && currentHour < 24) {
+                    btnEnd.disabled = false;
+                    statusMsg.innerText = "Sistem mendeteksi akhir hari. Amankan hari ini dengan evaluasi kesuksesanmu.";
+                    statusMsg.className = "text-xs text-emerald-400 font-semibold mt-2 px-2";
+                } else {
+                    btnEnd.disabled = true;
+                    statusMsg.innerText = "Sistem proteksi aktif. Bertahanlah hingga malam hari (20:00 - 23:59) untuk absen selesai.";
+                    statusMsg.className = "text-xs text-slate-400 mt-2 px-2";
+                }
+            }
+        }
+
+        // Buka Pledge (Ikrar Pagi) dengan Blacklist Reminder
+        function openPledgeModal() {
+            document.getElementById('pledge-input').value = '';
+
+            const ul = document.getElementById('display-blacklist');
+            ul.innerHTML = '';
+            blacklists.forEach(item => {
+                const li = document.createElement('li');
+                li.innerText = item;
+                ul.appendChild(li);
+            });
+
+            openModal('modal-pledge');
+        }
+
+        function verifyPledge() {
+            const val = document.getElementById('pledge-input').value.trim().toLowerCase();
+            if (val === p_phrase) {
+                dayStarted = true;
+                localStorage.setItem('dayStarted', 'true');
+                closeModal('modal-pledge');
+                updateUI();
+                customAlert("Misi Dimulai", "Fokus kognitif diaktifkan. Jaga benteng pikiranmu hari ini!", "🛡️");
+            } else {
+                customAlert("Gagal Validasi", "Kalimat yang diketik tidak sesuai. Tuliskan dengan penuh kesadaran.", "❌");
+            }
+        }
+
+        function openJournalModal() {
+            document.getElementById('journal-input').value = '';
+            openModal('modal-journal');
+        }
+
+        function submitEndDay() {
+            const journalText = document.getElementById('journal-input').value.trim();
+            const todayDate = new Date().toDateString();
+
+            if (journalText) {
+                let logs = JSON.parse(localStorage.getItem('habitLogs')) || [];
+                logs.push({ date: todayDate, note: journalText });
+                localStorage.setItem('habitLogs', JSON.stringify(logs));
+            }
+
+            streak++;
+            dayStarted = false;
+            lastDate = todayDate;
+
+            localStorage.setItem('habitStreak', streak);
+            localStorage.setItem('dayStarted', 'false');
+            localStorage.setItem('lastDate', todayDate);
+
+            closeModal('modal-journal');
+            updateUI();
+            checkBadgeAlerts();
+
+            if (streak >= targetDays) customAlert("LEGENDARY STATUS", `Selamat ${userName.toUpperCase()}! 69 Hari penuh kendali diri mutlak telah selesai!`, "👑");
+        }
+
+        // Logika Reset Data Berdasarkan Mode
+        function triggerResetFlow() {
+            document.getElementById('autopsy-plan').value = '';
+
+            // Sesuaikan teks di modal autopsy berdasarkan mode
+            const desc = document.getElementById('autopsy-desc');
+            const btn = document.getElementById('btn-execute-reset');
+
+            if (userMode === 'resilient' && lives > 0) {
+                desc.innerText = `Sistem Resilient Aktif. Anda memiliki ${lives} nyawa. Memproses ini akan mengurangi 1 nyawa dan memotong 3 hari streak (bukan reset ke 0).`;
+                btn.innerText = "Gunakan 1 Nyawa (-3 Hari)";
+            } else {
+                desc.innerText = "Sistem Iron Mind / Nyawa Habis. Gagal adalah data. Sistem akan mereset streak menjadi 0.";
+                btn.innerText = "Reset Menjadi 0";
+            }
+
+            openModal('modal-autopsy');
+        }
+
+        function executeResetData() {
+            const trg = document.getElementById('autopsy-trigger').value;
+            const plan = document.getElementById('autopsy-plan').value.trim();
+
+            if (!plan) {
+                customAlert("Data Diperlukan", "Mohon isi rencana strategi konkret besok terlebih dahulu. Ini penting untuk evaluasimu.", "📋");
+                return;
+            }
+
+            let failLogs = JSON.parse(localStorage.getItem('relapseLogs')) || [];
+            failLogs.push({ date: new Date().toLocaleDateString('id-ID'), trigger: trg, strategy: plan, lastStreak: streak });
+            localStorage.setItem('relapseLogs', JSON.stringify(failLogs));
+
+            // Logika Hukuman (Penalti)
+            if (userMode === 'resilient' && lives > 0) {
+                lives--;
+                streak = Math.max(0, streak - 3);
+                localStorage.setItem('userLives', lives);
+                localStorage.setItem('habitStreak', streak);
+
+                dayStarted = false;
+                localStorage.setItem('dayStarted', 'false');
+
+                closeModal('modal-autopsy');
+                updateUI();
+                customAlert("Nyawa Digunakan", `Kamu kehilangan 1 nyawa dan mundur 3 hari. Sisa nyawa: ${lives}. Jangan hancurkan semuanya, bangkit sekarang!`, "❤️‍🩹");
+            } else {
+                streak = 0;
+                dayStarted = false;
+                lastDate = null;
+
+                if (userMode === 'resilient') {
+                    // Jika nyawa habis di resilient, reset total dan berikan 3 nyawa baru untuk lembaran baru
+                    lives = 3;
+                    localStorage.setItem('userLives', 3);
+                }
+
+                localStorage.setItem('habitStreak', 0);
+                localStorage.removeItem('dayStarted');
+                localStorage.removeItem('lastDate');
+
+                closeModal('modal-autopsy');
+                updateUI();
+                customAlert("Sistem Di-reset", "Progres kembali ke 0. Strategi evaluasimu telah dimasukkan ke Vault. Mulai lembaran baru besok pagi.", "🔄");
+            }
+        }
+
+        function openVaultModal() {
+            const listContainer = document.getElementById('vault-list');
+            listContainer.innerHTML = '';
+            let failLogs = JSON.parse(localStorage.getItem('relapseLogs')) || [];
+
+            if (failLogs.length === 0) {
+                listContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-6 italic">Belum ada catatan evaluasi. Pertahankan!</p>';
+            } else {
+                failLogs.reverse().forEach(log => {
+                    const el = document.createElement('div');
+                    el.className = "bg-slate-950 border border-slate-800 p-3 rounded-xl text-left";
+                    el.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[10px] font-bold text-slate-500">${log.date}</span>
+                            <span class="text-[10px] bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded-full">Streak saat gagal: ${log.lastStreak}</span>
+                        </div>
+                        <p class="text-xs text-slate-300 mb-1"><span class="font-bold text-slate-400">Pemicu:</span> ${log.trigger}</p>
+                        <p class="text-xs text-slate-300"><span class="font-bold text-emerald-400">Strategi:</span> ${log.strategy}</p>
+                    `;
+                    listContainer.appendChild(el);
+                });
+            }
+            openModal('modal-vault');
+        }
+
+        // Fitur Baru: Salin Laporan Tempur
+        function copyLaporan() {
+            const savedTime = streak * 1;
+            const energy = Math.min(streak * 2, 100);
+            const textToCopy = `🛡️ 69 DAYS CHALLENGE 🛡️\nStatus: Hari ke-${streak}/69 berhasil diamankan!\n⏳ Waktu diselamatkan: ${savedTime} Jam\n🔋 Energi mental: Pulih +${energy}%\nPikiran terkendali mutlak.`;
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                customAlert("Disalin!", "Laporan tempur berhasil disalin ke clipboard. Bagikan ke rekan akuntabilitasmu!", "📋");
+            }).catch(() => {
+                alert("Gagal menyalin. Browser tidak mendukung fitur ini.");
+            });
+        }
+
+        function updateUI() {
+            const progressPercentage = Math.min((streak / targetDays) * 100, 100);
+            document.getElementById('streak-text').innerText = `${streak} / ${targetDays} Hari`;
+            document.getElementById('progress-bar').style.width = `${progressPercentage}%`;
+            document.getElementById('calc-time').innerText = `${streak * 1} Jam`;
+            document.getElementById('calc-energy').innerText = `Pulih +${Math.min(streak * 2, 100)}%`;
+
+            // Update Life Indicator
+            const lifeInd = document.getElementById('life-indicator');
+            if (userMode === 'iron') {
+                lifeInd.innerHTML = '💀 <span class="text-slate-400">Iron Mode</span>';
+            } else if (userMode === 'resilient') {
+                let hearts = '';
+                for (let i = 0; i < 3; i++) {
+                    hearts += i < lives ? '❤️' : '🖤';
+                }
+                lifeInd.innerHTML = `${hearts} <span class="text-slate-400 ml-1">Resilient</span>`;
+            }
+
+            const milestones = [7, 14, 30, 50];
+            milestones.forEach(m => {
+                const b = document.getElementById(`badge-${m}`);
+                if (streak >= m) {
+                    b.classList.remove('opacity-40', 'grayscale', 'bg-slate-850');
+                    b.classList.add('bg-indigo-950', 'border', 'border-indigo-500/40', 'text-indigo-200');
+                } else {
+                    b.classList.add('opacity-40', 'grayscale', 'bg-slate-850');
+                    b.classList.remove('bg-indigo-950', 'border', 'border-indigo-500/40', 'text-indigo-200');
+                }
+            });
+            checkTimeRules(new Date().getHours());
+        }
+
+        function checkBadgeAlerts() {
+            if (streak === 7) customAlert("Bronze Badge unlocked!", "7 Hari terlewati! Reseptor dopamin alamimu mulai melakukan kalibrasi ulang.", "🥉");
+            if (streak === 14) customAlert("Silver Badge unlocked!", "14 Hari terlewati! Neuroplastisitas otak mulai membentuk jalur kebiasaan baru.", "🥈");
+            if (streak === 30) customAlert("Gold Badge unlocked!", "30 Hari terlewati! Penguasaan diri penuh ada di genggamanmu.", "🥇");
+            if (streak === 50) customAlert("Platinum Badge unlocked!", "50 Hari terlewati! Karakter barumu hampir terbentuk sempurna.", "👑");
+        }
+
+        initData();
+    </script>
+</body>
+
+</html>
